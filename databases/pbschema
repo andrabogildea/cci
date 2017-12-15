@@ -1,0 +1,96 @@
+/*create table complexes(
+       complexid int not null auto_increment,
+       complexname varchar(100),
+       primary key (complexid)
+);
+create table buildings(
+       buildingid int not null auto_increment,
+       complexid int references complexes(complexid),
+       buildingname varchar(50),
+       address varchar(100),
+       primary key (buildingid)
+);
+create table apartaments(
+       aptid int not null auto_increment,
+       unitnumber varchar(10),
+       primary key (aptid),
+       buildingid int references buildings(buildingid)
+);
+create table tenants(
+       tenantid int not null auto_increment,
+       tenantname varchar(100),
+       primary key (tenantid)
+);
+create table apttenant(
+       tenantid int references tenants(tenantid),
+       aptid int references aparataments(aptid)
+);
+create table requests(
+       requestid int not null auto_increment,
+       stautus varchar(6),
+       aptid int references apartaments(aptid),
+       description varchar(100),
+       primary key (requestid)
+);
+
+insert into complexes (complexname) values
+('dorobantisol'), ('green'), ('lake');
+
+insert into buildings (complexid, buildingname, address) values
+(1, 'east', 'addr1'),
+(1, 'north', 'addr2'),
+(1, 'south', 'addr5'),
+(2, 'tall', 'addr3'),
+(2, 'medium', 'addr4');
+
+insert into apartaments (unitnumber, buildingid) values
+(1, 1), (2,1), (3,1), (6,2), (9,3), (21,3), (13,4);
+insert into tenants (tenantname) values
+('andra'), ('sever'), ('andreea'), ('diana');
+
+insert into apttenant values
+(1,1), (1,5), (2, 2), (3, 7);
+
+insert into requests (stautus, aptid, description) values
+('open', 3, 'abc'),
+('open', 4, 'cde'),
+('close', 6, 'def');
+*/
+
+/*-------------1------------------*/
+
+/*
+select tenantname
+from tenants inner join
+     (select tenantid
+     from apttenant
+     group by apttenant.tenantid
+     having count(apttenant.aptid) > 1) c
+on tenants.tenantid = c.tenantid;
+
+select tenants.tenantname
+from tenants inner join apttenant
+on tenants.tenantid = apttenant.tenantid
+group by apttenant.tenantid
+having count(apttenant.aptid) > 1;
+*/
+
+/*-------------2--------------*/
+/*
+select buildingname, ifnull(nr, 0) as nrr
+from buildings left join
+  (select buildingid, count(requests.aptid) as nr
+  from apartaments inner join requests
+  on apartaments.aptid = requests.aptid
+  where requests.stautus = 'open'
+  group by apartaments.buildingid) aptnr
+ on buildings.buildingid = aptnr.buildingid;
+ */
+
+/*--------------3--------------*/
+update requests
+set stautus='close'
+where aptid in
+      (select aptid
+      from apartaments
+      where buildingid=1);

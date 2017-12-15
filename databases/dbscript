@@ -1,0 +1,79 @@
+/*CREATE DATABASE cci;
+USE cci;
+
+create table Teachers(
+    id int not null auto_increment,
+    firstname varchar(50),
+    lastname varchar(50),
+    primary key (id)
+);
+
+create table Students(
+    st_id int not null auto_increment,
+    st_firstname varchar(50),
+    st_lastname varchar(50),
+    primary key (st_id)
+);
+
+create table Courses(
+    c_id int not null auto_increment,
+    c_name varchar(100),
+    teacher_id int references Teachers(id),
+    primary key (c_id)
+);
+
+create table StudentCourse(
+    st_id int references Students(st_id),
+    c_id int references Courses(c_id)
+);
+
+
+insert into Teachers (firstname, lastname) values ('Victor', 'Marica');
+insert into Teachers (firstname, lastname) values ('Ana', 'Pop');
+insert into Teachers (firstname, lastname) values ('Diana', 'Ionescu');
+
+
+insert into Students (st_firstname, st_lastname) values
+('Andra', 'Bogildea'),
+('Sever', 'Banesiu'),
+('Oana', 'Petrusel'),
+('Mihai', 'Muresan'),
+('Paul', 'Campean'),
+('Mihaela', 'Batinas');
+
+insert into Courses (c_name, teacher_id) values
+('Geometrie', 1),
+('Arictmetica', 1),
+('Geografie', 2),
+('Istorie', 3);
+
+insert into StudentCourse values
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 1),
+(2, 2),
+(3, 3),
+(4, 3);
+*/
+select students.st_id, students.st_firstname, count(studentcourse.c_id) as Cnt
+from students left join studentcourse
+on students.st_id = studentcourse.st_id
+group by students.st_id;
+
+select teachers.firstname, count(studentcourse.c_id) as size
+from teachers left join courses
+on teachers.id=courses.teacher_id
+left join studentcourse
+on studentcourse.c_id = courses.c_id
+group by teachers.id
+order by size desc;
+
+select teachers.firstname, sum(studentsize.number)
+from teachers left join
+    (select courses.c_id, courses.teacher_id as tid, count(studentcourse.st_id) as number
+    from courses inner join studentcourse
+    on courses.c_id = studentcourse.c_id
+    group by studentcourse.c_id) studentsize
+on teachers.id = studentsize.tid
+group by teachers.id;
